@@ -7,7 +7,7 @@ def call_grader(rubric, submission, translate=False):
     Calls the Groq AI API and returns a CLEAN dictionary.
     """
     
-    # --- 1. API CLIENT SETUP (Groq only) ---
+    # --- 1. API CLIENT SETUP ---
     client = Groq(api_key=st.secrets["GROQ_KEY"])
     model = "llama-3.1-8b-instant"
 
@@ -41,7 +41,7 @@ def call_grader(rubric, submission, translate=False):
     # --- 4. PARSE THE RESPONSE ---
     result_data = json.loads(response.choices[0].message.content)
 
-    # --- 5. 🛡️ CRITICAL FIX: CLEAN & STANDARDIZE THE DATA ---
+    # --- 5. CLEAN & STANDARDIZE THE DATA ---
     
     # Fix 'feedback': If it's a single string, split it into a list of bullet points.
     if isinstance(result_data.get('feedback'), str):
@@ -68,3 +68,32 @@ def call_grader(rubric, submission, translate=False):
     result_data.setdefault('score', 'N/A')
 
     return result_data
+
+
+def suggest_rubric(submission):
+    """
+    Uses Groq to generate a grading rubric based on the submission.
+    """
+    client = Groq(api_key=st.secrets["GROQ_KEY"])
+    model = "llama-3.1-8b-instant"
+    
+    prompt = f"""
+    Based on this student submission, create a detailed grading rubric with 3 to 4 categories and their percentage weights. 
+    The total must equal 100%.
+    
+    Submission: {submission}
+    
+    Output format (just plain text, no markdown, no bullet points, no asterisks):
+    Category 1 (X%): Description
+    Category 2 (Y%): Description
+    Category 3 (Z%): Description
+    Category 4 (W%): Description
+    """
+    
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+    
+    return response.choices[0].message.content

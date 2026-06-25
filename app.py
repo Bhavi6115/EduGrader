@@ -1,6 +1,7 @@
 import streamlit as st
-from utils.grader import call_grader
+from utils.grader import call_grader, suggest_rubric
 from utils.report_generator import generate_pdf
+from PyPDF2 import PdfReader
 import time
 
 # --- PAGE CONFIG ---
@@ -19,24 +20,26 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SESSION STATE INIT (For Sample Essay pre-fill) ---
+# --- SESSION STATE INIT ---
 if 'submission' not in st.session_state:
     st.session_state['submission'] = ''
 if 'rubric' not in st.session_state:
     st.session_state['rubric'] = ''
+if 'history' not in st.session_state:
+    st.session_state['history'] = []
 
-# --- MAIN UI HEADER (HIGH CONTRAST FIXED) ---
+# --- MAIN UI HEADER ---
 st.markdown("""
     <div style="text-align: center; padding: 0.5rem 0 1.5rem 0;">
         <h1 style="color: #6366f1; font-size: 3.5rem; font-weight: 900; margin: 0;">🎓 EduGrader</h1>
         <p style="color: #1e293b; font-size: 1.2rem; margin: 0; font-weight: 500;">Instant Feedback Machine • Track 2</p>
-        <p style="color: #475569; font-size: 0.95rem;">Paste the student submission and rubric to get AI-powered, actionable feedback.</p>
+        <p style="color: #475569; font-size: 0.95rem;">Upload a PDF, paste text, or load a sample essay to get AI-powered, actionable feedback.</p>
     </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
-# --- SAMPLE ESSAY BUTTON (Above the inputs) ---
+# --- SAMPLE ESSAY BUTTON ---
 col_sample_btn, col_sample_space = st.columns([1, 5])
 with col_sample_btn:
     if st.button("📝 Load Sample Essay", use_container_width=True):
@@ -49,13 +52,47 @@ col_input_left, col_input_right = st.columns(2, gap="large")
 
 with col_input_left:
     st.markdown('<p style="font-weight: 600; color: #1e293b;">📝 Student Submission</p>', unsafe_allow_html=True)
-    submission = st.text_area(
-        "", 
-        height=280, 
-        value=st.session_state['submission'],
-        placeholder="Paste the student's essay, math solution, or answer here...", 
+    
+    # --- PDF UPLOADER ---
+    uploaded_file = st.file_uploader(
+        "📎 Upload PDF (or paste text below)", 
+        type=["pdf"], 
+        key="pdf_uploader",
         label_visibility="collapsed"
     )
+    
+    if uploaded_file is not None:
+        try:
+            reader = PdfReader(uploaded_file)
+            extracted_text = ""
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    extracted_text += page_text + "\n"
+            
+            if extracted_text.strip():
+                st.session_state['submission'] = extracted_text.strip()
+                st.success(f"✅ Extracted {len(extracted_text)} characters from PDF! You can edit the text below if needed.")
+            else:
+                st.warning("⚠️ Could not extract text from this PDF. Please paste manually.")
+        except Exception as e:
+            st.error(f"❌ Error reading PDF: {e}")
+    
+    submission = st.text_area(
+        "", 
+        height=250, 
+        value=st.session_state['submission'],
+        placeholder="Paste the student's essay, math solution, or answer here... Or upload a PDF above!", 
+        label_visibility="collapsed"
+    )
+    
+    # --- WORD COUNT & READABILITY STATS (NEW) ---
+    if submission:
+        word_count = len(submission.split())
+        char_count = len(submission)
+        sentence_count = submission.count('.') + submission.count('?') + submission.count('!')
+        reading_time = max(1, round(word_count / 200))
+        st.caption(f"📊 {word_count} words • {char_count} characters • {sentence_count} sentences • ~{reading_time} min read")
 
 with col_input_right:
     st.markdown('<p style="font-weight: 600; color: #1e293b;">📋 Quick Rubric Templates</p>', unsafe_allow_html=True)
@@ -73,9 +110,22 @@ with col_input_right:
         default_rubric = "Grammar 40%, Clarity 30%, Relevance 30%"
     
     st.markdown('<p style="font-weight: 600; color: #1e293b; margin-top: 10px;">📋 Grading Rubric</p>', unsafe_allow_html=True)
+    
+    # --- AI RUBRIC SUGGESTER BUTTON (NEW) ---
+    col_rubric_btn, col_rubric_space = st.columns([1, 2])
+    with col_rubric_btn:
+        if st.button("✨ Suggest Rubric", use_container_width=True, help="AI will generate a rubric based on your submission"):
+            if submission:
+                with st.spinner("🧠 Generating rubric..."):
+                    suggested = suggest_rubric(submission)
+                    st.session_state['rubric'] = suggested
+                    st.rerun()
+            else:
+                st.warning("⚠️ Please paste a submission first!")
+    
     rubric = st.text_area(
         "", 
-        height=200, 
+        height=180, 
         value=st.session_state['rubric'] or default_rubric,
         label_visibility="collapsed",
         help="Define the criteria and weightage for grading."
@@ -94,6 +144,13 @@ if grade_button and submission:
         with st.spinner("🧠 Analyzing submission... (This takes ~2 seconds)"):
             result = call_grader(rubric, submission, translate=False)
             time.sleep(0.5)
+            
+            # Save to history (NEW)
+            st.session_state['history'].append({
+                "timestamp": time.strftime("%H:%M:%S"),
+                "score": result['score'],
+                "preview": submission[:60] + "..." if len(submission) > 60 else submission
+            })
 
         # 1. The BIG Score
         st.markdown(f"""
@@ -105,7 +162,7 @@ if grade_button and submission:
             </div>
         """, unsafe_allow_html=True)
 
-        # 2. STRENGTHS & WEAKNESSES (Side by Side)
+        # 2. STRENGTHS & WEAKNESSES
         col_str, col_weak = st.columns(2, gap="large")
         
         with col_str:
@@ -124,7 +181,7 @@ if grade_button and submission:
             else:
                 st.caption("No major weaknesses found.")
 
-        # 3. NEXT STEPS (Full Width)
+        # 3. NEXT STEPS
         st.markdown('<p style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem; margin-top: 1.5rem;">🚀 Next Steps (Actionable Feedback)</p>', unsafe_allow_html=True)
         if result['feedback']:
             html_feedback = "".join([f'<div class="card-feedback">💡 {f}</div>' for f in result['feedback']])
@@ -134,10 +191,9 @@ if grade_button and submission:
 
         st.divider()
 
-        # 4. COPY & DOWNLOAD SECTION (100% RELIABLE)
+        # 4. EXPORT SECTION
         st.subheader("📋 Share & Export Feedback")
         
-        # Prepare the formatted text
         copy_text = f"🎓 EduGrader Feedback Report\n"
         copy_text += f"{'='*40}\n\n"
         copy_text += f"📊 Total Score: {result['score']}\n\n"
@@ -157,16 +213,11 @@ if grade_button and submission:
         copy_text += f"\n{'='*40}\n"
         copy_text += "Generated by EduGrader • Built with ❤️ for students by Bhavii"
         
-        # Two columns: Left = Code block + TXT download, Right = PDF download
         col_left, col_right = st.columns(2, gap="large")
         
         with col_left:
             st.markdown("**📝 Copy Feedback Manually or Download as TXT**")
-            
-            # Display the text in a clean code block
             st.code(copy_text, language="text")
-            
-            # Download as TXT button
             st.download_button(
                 label="📄 Download as TXT File",
                 data=copy_text,
@@ -178,8 +229,6 @@ if grade_button and submission:
         
         with col_right:
             st.markdown("**📥 Download PDF Report**")
-            
-            # PDF Download Button
             try:
                 pdf_buffer = generate_pdf(result)
                 st.download_button(
@@ -192,8 +241,17 @@ if grade_button and submission:
                 )
             except Exception as e:
                 st.error(f"❌ Could not generate PDF: {e}")
+        
+        # 5. GRADING HISTORY (NEW)
+        st.divider()
+        with st.expander("📜 Grading History (Last 5 Submissions)"):
+            if st.session_state['history']:
+                for i, item in enumerate(reversed(st.session_state['history'][-5:])):
+                    st.write(f"**{i+1}.** Score: **{item['score']}** | {item['preview']} | {item['timestamp']}")
+            else:
+                st.caption("No submissions graded yet.")
 
-# --- FOOTER (HIGH CONTRAST FIXED) ---
+# --- FOOTER ---
 st.divider()
 st.markdown("""
     <div style="text-align: center; padding: 1rem 0 0.5rem 0;">
