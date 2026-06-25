@@ -11,14 +11,24 @@ def call_grader(rubric, submission, translate=False):
     client = Groq(api_key=st.secrets["GROQ_KEY"])
     model = "llama-3.1-8b-instant"
 
-    # --- 2. BUILD THE PROMPT ---
+    # --- 2. BUILD THE PROMPT (UPDATED TO FORCE UNIQUE SCORES) ---
     prompt = f"""
     Rubric: {rubric}
     Submission: {submission}
     
-    IMPORTANT: Output strictly valid JSON with the following EXACT structure:
+    TASK: You are a strict academic grader. 
+    1. Carefully analyze the submission against the provided rubric.
+    2. Calculate the total score out of 100 based STRICTLY on the rubric criteria percentages.
+    3. Provide specific, unique, and actionable feedback.
+    
+    IMPORTANT RULES:
+    - DO NOT use the score "85/100" as a default. Generate a UNIQUE score based on this specific submission.
+    - The score should reflect the quality of the submission according to the rubric.
+    - Output strictly valid JSON with NO additional text, comments, or explanations.
+    
+    Output format:
     {{
-        "score": "85/100",
+        "score": "XX/100",
         "strengths": ["Strength point 1", "Strength point 2"],
         "weaknesses": ["Weakness point 1", "Weakness point 2"],
         "feedback": ["Actionable step 1", "Actionable step 2", "Actionable step 3"]
@@ -32,10 +42,11 @@ def call_grader(rubric, submission, translate=False):
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": "You are a strict academic grader. Always output valid JSON. The 'feedback' key must ALWAYS be a list of sentences."},
+            {"role": "system", "content": "You are a strict academic grader. Always output valid JSON. Never use the example score from the prompt — calculate a unique score for each submission."},
             {"role": "user", "content": prompt}
         ],
-        response_format={"type": "json_object"}
+        response_format={"type": "json_object"},
+        temperature=0.7  # Slight randomness helps prevent lazy copying
     )
 
     # --- 4. PARSE THE RESPONSE ---
