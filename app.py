@@ -7,15 +7,12 @@ import time
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="EduGrader AI", page_icon="🎓", layout="wide")
 
-# --- CUSTOM STYLES (Light theme is now handled by config.toml) ---
+# --- CUSTOM STYLES ---
 st.markdown("""
     <style>
-        /* 🟣 FORCE EDUGRADER TITLE PURPLE */
         .stMarkdown h1, .stApp h1, h1, .stApp h1 *, .stMarkdown h1 * {
             color: #6366f1 !important;
         }
-        
-        /* CUSTOM PILLS (Strengths/Weaknesses) */
         .pill-green {
             background: #dcfce7 !important;
             color: #166534 !important;
@@ -27,7 +24,6 @@ st.markdown("""
             display: inline-block !important;
             margin-bottom: 6px !important;
         }
-        
         .pill-red {
             background: #fee2e2 !important;
             color: #991b1b !important;
@@ -39,7 +35,6 @@ st.markdown("""
             display: inline-block !important;
             margin-bottom: 6px !important;
         }
-        
         .card-feedback {
             background: #eff6ff !important;
             padding: 0.9rem 1.2rem !important;
@@ -73,6 +68,8 @@ if 'previous_result' not in st.session_state:
     st.session_state['previous_result'] = None
 if 'viewing_history' not in st.session_state:
     st.session_state['viewing_history'] = False
+if 'pdf_processed' not in st.session_state:
+    st.session_state['pdf_processed'] = False
 
 # --- MAIN UI HEADER ---
 st.markdown("""
@@ -93,6 +90,7 @@ with col_sample_btn:
         st.session_state['rubric'] = "Grammar & Sentence Structure: 30%, Argument & Persuasion: 30%, Vocabulary & Clarity: 25%, Conclusion Strength: 15%"
         st.session_state['previous_result'] = None
         st.session_state['viewing_history'] = False
+        st.session_state['pdf_processed'] = False
         st.rerun()
 
 # --- INPUT SECTION ---
@@ -101,6 +99,7 @@ col_input_left, col_input_right = st.columns(2, gap="large")
 with col_input_left:
     st.markdown('<p style="font-weight: 600; color: #1e293b;">📝 Student Submission</p>', unsafe_allow_html=True)
     
+    # --- PDF UPLOADER ---
     uploaded_file = st.file_uploader(
         "📎 Upload PDF (or paste text below)", 
         type=["pdf"], 
@@ -108,25 +107,28 @@ with col_input_left:
         label_visibility="collapsed"
     )
     
-    if uploaded_file is not None:
+    if uploaded_file is not None and not st.session_state.get('pdf_processed', False):
         try:
-            reader = PdfReader(uploaded_file)
-            extracted_text = ""
-            for page in reader.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    extracted_text += page_text + "\n"
-            
-            if extracted_text.strip():
-                st.session_state['submission'] = extracted_text.strip()
-                st.session_state['previous_result'] = None
-                st.success(f"✅ Extracted {len(extracted_text)} characters from PDF!")
-                st.rerun()
-            else:
-                st.warning("⚠️ Could not extract text from this PDF.")
+            with st.spinner("📄 Extracting text from PDF..."):
+                reader = PdfReader(uploaded_file)
+                extracted_text = ""
+                for page in reader.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        extracted_text += page_text + "\n"
+                
+                if extracted_text.strip():
+                    st.session_state['submission'] = extracted_text.strip()
+                    st.session_state['pdf_processed'] = True
+                    st.session_state['previous_result'] = None
+                    st.success(f"✅ Extracted {len(extracted_text)} characters from PDF! Text auto-filled below.")
+                    st.rerun()
+                else:
+                    st.warning("⚠️ Could not extract text from this PDF. Please paste manually.")
         except Exception as e:
             st.error(f"❌ Error reading PDF: {e}")
     
+    # --- TEXT AREA (Uses value, no key) ---
     submission = st.text_area(
         "", 
         height=250, 
@@ -135,10 +137,13 @@ with col_input_left:
         label_visibility="collapsed"
     )
     
+    # Sync user edits back to session state
     if submission != st.session_state['submission']:
         st.session_state['submission'] = submission
         st.session_state['previous_result'] = None
+        st.session_state['pdf_processed'] = False
     
+    # --- WORD COUNT STATS ---
     if submission:
         word_count = len(submission.split())
         char_count = len(submission)
@@ -153,7 +158,8 @@ with col_input_right:
         ["Custom", "Standard Essay (Grammar 40%, Clarity 30%, Relevance 30%)", 
          "Math Problem (Accuracy 50%, Steps 30%, Presentation 20%)", 
          "Science Report (Hypothesis 30%, Data 40%, Conclusion 30%)"],
-        label_visibility="collapsed"
+        label_visibility="collapsed",
+        key="rubric_preset"
     )
     
     if rubric_preset != "Custom":
@@ -175,6 +181,7 @@ with col_input_right:
             else:
                 st.warning("⚠️ Please paste a submission first!")
     
+    # --- RUBRIC TEXT AREA (Uses value, no key) ---
     rubric = st.text_area(
         "", 
         height=180, 
@@ -183,6 +190,7 @@ with col_input_right:
         help="Define the criteria and weightage for grading."
     )
     
+    # Sync user edits back to session state
     if rubric != st.session_state['rubric']:
         st.session_state['rubric'] = rubric
 
@@ -356,6 +364,7 @@ with st.expander("📜 Grading History (Click 'Load' to view any past submission
                 st.caption(item['preview'])
             with col4:
                 if st.button(f"📂 Load", key=f"load_{idx}"):
+                    # Use the regular session state variables (not widget keys)
                     st.session_state['submission'] = item['submission']
                     st.session_state['rubric'] = item['rubric']
                     st.session_state['previous_result'] = item['result']
