@@ -7,25 +7,186 @@ import time
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="EduGrader AI", page_icon="🎓", layout="wide")
 
-# --- FORCE LIGHT THEME ---
+# --- 🔥 FORCE LIGHT MODE WITH INLINE CSS (100% guaranteed to work) ---
+# --- 🔥 FORCE LIGHT MODE WITH INLINE CSS (100% guaranteed to work) ---
 st.markdown("""
     <style>
-        .stApp { background-color: #f8fafc !important; }
-        .stApp > header { background-color: #ffffff !important; }
-        .stApp > div { background-color: #f8fafc !important; }
-        .stMarkdown, .stMarkdown p, .stMarkdown div { color: #1e293b !important; }
-        .stTextArea textarea { background-color: #ffffff !important; color: #1e293b !important; }
-        .stTextArea textarea::placeholder { color: #94a3b8 !important; }
-        .stSelectbox div[data-baseweb="select"] { background-color: #ffffff !important; color: #1e293b !important; }
-        .stButton > button { color: #1e293b !important; }
-        .stFileUploader > div { background-color: #ffffff !important; }
-        section[data-testid="stSidebar"] { background-color: #ffffff !important; }
+        /* Force entire app to white background */
+        .stApp, .stApp > header, [data-testid="stAppViewContainer"], 
+        [data-testid="stHeader"], [data-testid="stSidebar"], 
+        section.main, .main, div.block-container {
+            background-color: #ffffff !important;
+        }
+        
+        /* Force all text to be dark (except H1 which we handle below) */
+        .stMarkdown p, .stMarkdown div, .stMarkdown span,
+        .stTextInput label, .stSelectbox label, .stTextArea label,
+        .stNumberInput label, .stDateInput label, .stTimeInput label,
+        .stFileUploader label, .stButton label {
+            color: #1e293b !important;
+        }
+        
+        /* 🟣🟣🟣 FORCE EDUGRADER TITLE TO BE PURPLE (OVERRIDES EVERYTHING) 🟣🟣🟣 */
+        .stMarkdown h1, .stApp h1, h1, .stApp h1 *, .stMarkdown h1 * {
+            color: #6366f1 !important;
+        }
+        
+        /* Force text areas to be white */
+        .stTextArea textarea, .stTextInput input {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            font-size: 1rem !important;
+            line-height: 1.6 !important;
+            padding: 1rem !important;
+        }
+        
+        .stTextArea textarea:focus, .stTextInput input:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+        
+        /* Force select boxes */
+        .stSelectbox div[data-baseweb="select"] {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+        }
+        
+        .stSelectbox div[data-baseweb="select"] * {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+        }
+        
+        /* Force buttons */
+        .stButton > button {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 40px !important;
+            font-weight: 600 !important;
+        }
+        
+        .stButton > button:hover {
+            background-color: #f1f5f9 !important;
+            border-color: #6366f1 !important;
+        }
+        
+        /* Primary button (Grade Now) */
+        .stButton > button[data-testid="baseButton-primary"] {
+            background: linear-gradient(145deg, #6366f1, #4f46e5) !important;
+            color: white !important;
+            border: none !important;
+            font-weight: 700 !important;
+            font-size: 1.2rem !important;
+            padding: 0.75rem 2rem !important;
+            border-radius: 60px !important;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.30) !important;
+        }
+        
+        .stButton > button[data-testid="baseButton-primary"]:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(99, 102, 241, 0.40) !important;
+        }
+        
+        /* Force alerts */
+        .stAlert {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+        
+        /* Force expander */
+        .streamlit-expanderHeader {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+        }
+        
+        /* Force code blocks */
+        .stCodeBlock {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            border-radius: 16px !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        
+        /* Force file uploader */
+        .stFileUploader > div {
+            background-color: #f8fafc !important;
+            border: 2px dashed #cbd5e1 !important;
+            border-radius: 16px !important;
+        }
+        
+        /* Force divider */
+        hr {
+            border-color: #e2e8f0 !important;
+        }
+        
+        /* Force metric */
+        div[data-testid="stMetric"] {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            padding: 1rem !important;
+        }
+        
+        div[data-testid="stMetricValue"] {
+            color: #4f46e5 !important;
+            font-size: 2.8rem !important;
+            font-weight: 800 !important;
+        }
+        
+        /* Force columns */
+        div[data-testid="column"] {
+            background: #ffffff !important;
+            padding: 1.5rem 1.8rem !important;
+            border-radius: 20px !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        
+        /* Caption text */
+        .stCaption {
+            color: #94a3b8 !important;
+        }
+        
+        /* Custom pills (green/red) - already in the code, but just in case */
+        .pill-green {
+            background: #dcfce7 !important;
+            color: #166534 !important;
+            padding: 0.5rem 1.2rem !important;
+            border-radius: 40px !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            border: 1px solid #bbf7d0 !important;
+            display: inline-block !important;
+            margin-bottom: 6px !important;
+        }
+        
+        .pill-red {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+            padding: 0.5rem 1.2rem !important;
+            border-radius: 40px !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            border: 1px solid #fecaca !important;
+            display: inline-block !important;
+            margin-bottom: 6px !important;
+        }
+        
+        .card-feedback {
+            background: #eff6ff !important;
+            padding: 0.9rem 1.2rem !important;
+            border-radius: 16px !important;
+            border-left: 6px solid #6366f1 !important;
+            font-size: 0.95rem !important;
+            color: #1e293b !important;
+            line-height: 1.6 !important;
+            margin-bottom: 8px !important;
+        }
     </style>
 """, unsafe_allow_html=True)
-
-# --- LOAD CUSTOM CSS ---
-with open("assets/style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # --- HIDE DEFAULT STREAMLIT FOOTER/MENU ---
 st.markdown("""
@@ -101,7 +262,6 @@ with col_input_left:
         except Exception as e:
             st.error(f"❌ Error reading PDF: {e}")
     
-    # --- TEXT AREA (NO KEY, JUST VALUE) ---
     submission = st.text_area(
         "", 
         height=250, 
@@ -110,7 +270,6 @@ with col_input_left:
         label_visibility="collapsed"
     )
     
-    # Update state when user types
     if submission != st.session_state['submission']:
         st.session_state['submission'] = submission
         st.session_state['previous_result'] = None
@@ -151,7 +310,6 @@ with col_input_right:
             else:
                 st.warning("⚠️ Please paste a submission first!")
     
-    # --- TEXT AREA (NO KEY, JUST VALUE) ---
     rubric = st.text_area(
         "", 
         height=180, 
@@ -160,7 +318,6 @@ with col_input_right:
         help="Define the criteria and weightage for grading."
     )
     
-    # Update state when user types
     if rubric != st.session_state['rubric']:
         st.session_state['rubric'] = rubric
 
@@ -172,9 +329,7 @@ with col_center:
         st.session_state['previous_result'] = None
         st.session_state['viewing_history'] = False
 
-# --- DISPLAY RESULTS (Either Freshly Graded OR Loaded from History) ---
-
-# Check if we are viewing a loaded history result
+# --- DISPLAY RESULTS ---
 if st.session_state.get('previous_result') is not None and st.session_state.get('viewing_history', False):
     result = st.session_state['previous_result']
     
@@ -322,7 +477,7 @@ if (st.session_state.get('previous_result') is not None and
         except Exception as e:
             st.error(f"❌ Could not generate PDF: {e}")
 
-# --- GRADING HISTORY (Simplified: Just loads into state) ---
+# --- GRADING HISTORY ---
 st.divider()
 with st.expander("📜 Grading History (Click 'Load' to view any past submission instantly)", expanded=False):
     if st.session_state['history']:
