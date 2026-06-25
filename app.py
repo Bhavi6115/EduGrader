@@ -7,166 +7,15 @@ import time
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="EduGrader AI", page_icon="🎓", layout="wide")
 
-# --- 🔥 FORCE LIGHT MODE WITH INLINE CSS ---
+# --- CUSTOM STYLES (Light theme is now handled by config.toml) ---
 st.markdown("""
     <style>
-        /* Force entire app to white background */
-        .stApp, .stApp > header, [data-testid="stAppViewContainer"], 
-        [data-testid="stHeader"], [data-testid="stSidebar"], 
-        section.main, .main, div.block-container {
-            background-color: #ffffff !important;
-        }
-        
-        /* Force all text to be dark (except H1) */
-        .stMarkdown p, .stMarkdown div, .stMarkdown span,
-        .stTextInput label, .stSelectbox label, .stTextArea label,
-        .stNumberInput label, .stDateInput label, .stTimeInput label,
-        .stFileUploader label, .stButton label {
-            color: #1e293b !important;
-        }
-        
-        /* 🟣 FORCE EDUGRADER TITLE TO BE PURPLE */
+        /* 🟣 FORCE EDUGRADER TITLE PURPLE */
         .stMarkdown h1, .stApp h1, h1, .stApp h1 *, .stMarkdown h1 * {
             color: #6366f1 !important;
         }
         
-        /* Force text areas to be white */
-        .stTextArea textarea, .stTextInput input {
-            background-color: #ffffff !important;
-            color: #1e293b !important;
-            border: 2px solid #e2e8f0 !important;
-            border-radius: 16px !important;
-            font-size: 1rem !important;
-            line-height: 1.6 !important;
-            padding: 1rem !important;
-        }
-        
-        .stTextArea textarea:focus, .stTextInput input:focus {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
-        }
-        
-        /* Force select boxes */
-        .stSelectbox div[data-baseweb="select"] {
-            background-color: #ffffff !important;
-            color: #1e293b !important;
-        }
-        
-        .stSelectbox div[data-baseweb="select"] * {
-            background-color: #ffffff !important;
-            color: #1e293b !important;
-        }
-        
-        /* --- FIX: SHARE & EXPORT SECTION (WHITE) --- */
-        .stSubheader, .stSubheader * {
-            color: #1e293b !important;
-        }
-        
-        .stCodeBlock, .stCodeBlock * {
-            background-color: #f1f5f9 !important;
-            color: #1e293b !important;
-        }
-        
-        .stDownloadButton > button, .stButton > button {
-            background-color: #ffffff !important;
-            color: #4f46e5 !important;
-            border: 2px solid #4f46e5 !important;
-            border-radius: 40px !important;
-            font-weight: 700 !important;
-            padding: 0.5rem 1.5rem !important;
-        }
-        
-        .stDownloadButton > button:hover, .stButton > button:hover {
-            background-color: #4f46e5 !important;
-            color: white !important;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
-        }
-        
-        /* --- FIX: GRADING HISTORY EXPANDER (WHITE) --- */
-        .streamlit-expanderHeader {
-            background-color: #ffffff !important;
-            color: #1e293b !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 12px !important;
-        }
-        
-        .streamlit-expanderContent {
-            background-color: #ffffff !important;
-            color: #1e293b !important;
-        }
-        
-        .streamlit-expanderContent p, .streamlit-expanderContent div {
-            color: #1e293b !important;
-        }
-        
-        /* --- FIX: WRITE/CAPTION/CONTAINER FOR HISTORY --- */
-        .stWrite, .stWrite * {
-            color: #1e293b !important;
-        }
-        
-        .stCaption {
-            color: #475569 !important;
-        }
-        
-        /* --- FIX: DIVIDERS --- */
-        hr {
-            border-color: #e2e8f0 !important;
-        }
-        
-        /* --- FIX: ALERTS --- */
-        .stAlert {
-            background-color: #f8fafc !important;
-            color: #1e293b !important;
-        }
-        
-        /* --- FIX: FILE UPLOADER --- */
-        .stFileUploader > div {
-            background-color: #f8fafc !important;
-            border: 2px dashed #cbd5e1 !important;
-            border-radius: 16px !important;
-        }
-        
-        /* --- FIX: METRIC --- */
-        div[data-testid="stMetric"] {
-            background-color: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 16px !important;
-            padding: 1rem !important;
-        }
-        
-        div[data-testid="stMetricValue"] {
-            color: #4f46e5 !important;
-            font-size: 2.8rem !important;
-            font-weight: 800 !important;
-        }
-        
-        /* --- FIX: COLUMNS --- */
-        div[data-testid="column"] {
-            background: #ffffff !important;
-            padding: 1.5rem 1.8rem !important;
-            border-radius: 20px !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        
-        /* --- FIX: PRIMARY BUTTON (Grade Now) --- */
-        .stButton > button[data-testid="baseButton-primary"] {
-            background: linear-gradient(145deg, #6366f1, #4f46e5) !important;
-            color: white !important;
-            border: none !important;
-            font-weight: 700 !important;
-            font-size: 1.2rem !important;
-            padding: 0.75rem 2rem !important;
-            border-radius: 60px !important;
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.30) !important;
-        }
-        
-        .stButton > button[data-testid="baseButton-primary"]:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 16px 40px rgba(99, 102, 241, 0.40) !important;
-        }
-        
-        /* --- CUSTOM PILLS --- */
+        /* CUSTOM PILLS (Strengths/Weaknesses) */
         .pill-green {
             background: #dcfce7 !important;
             color: #166534 !important;
@@ -345,7 +194,7 @@ with col_center:
         st.session_state['previous_result'] = None
         st.session_state['viewing_history'] = False
 
-# --- DISPLAY RESULTS ---
+# --- DISPLAY LOADED HISTORY RESULT ---
 if st.session_state.get('previous_result') is not None and st.session_state.get('viewing_history', False):
     result = st.session_state['previous_result']
     
