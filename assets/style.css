@@ -1,0 +1,190 @@
+/* ------------------------------
+   PREMIUM ED-TECH UI OVERHAUL
+   ------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.stApp {
+    background: #f8fafc;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ------------------------------
+   SIDEBAR UPGRADE
+   ------------------------------ */
+section[data-testid="stSidebar"] {
+    background: #ffffff !important;
+    border-right: 1px solid #f1f5f9 !important;
+    padding: 2rem 1rem !important;
+}
+
+section[data-testid="stSidebar"] .stSelectbox label {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+}
+
+/* ------------------------------
+   TEXT AREAS (Clean & Large)
+   ------------------------------ */
+.stTextArea textarea {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    transition: all 0.2s ease !important;
+    padding: 1rem !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+}
+
+.stTextArea textarea:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* ------------------------------
+   BUTTONS (Primary Grade Action)
+   ------------------------------ */
+.stButton > button[data-testid="baseButton-primary"] {
+    background: linear-gradient(145deg, #6366f1, #4f46e5) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.2rem !important;
+    padding: 0.75rem 2rem !important;
+    border: none !important;
+    border-radius: 60px !important;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.30) !important;
+    transition: all 0.25s ease !important;
+    letter-spacing: 0.5px;
+}
+
+.stButton > button[data-testid="baseButton-primary"]:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(99, 102, 241, 0.40) !important;
+    background: linear-gradient(145deg, #818cf8, #4f46e5) !important;
+}
+
+/* ------------------------------
+   CUSTOM HTML PILLS (Strengths/Weaknesses)
+   ------------------------------ */
+.pill-green {
+    background: #dcfce7;
+    color: #166534;
+    padding: 0.5rem 1.2rem;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid #bbf7d0;
+    transition: all 0.2s ease;
+    white-space: normal;
+    word-break: break-word;
+}
+.pill-green:hover {
+    background: #bbf7d0;
+    transform: translateY(-2px);
+}
+
+.pill-red {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 0.5rem 1.2rem;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid #fecaca;
+    transition: all 0.2s ease;
+    white-space: normal;
+    word-break: break-word;
+}
+.pill-red:hover {
+    background: #fecaca;
+    transform: translateY(-2px);
+}
+
+/* ------------------------------
+   FIX FOR NEXT STEPS (Full Width Cards)
+   ------------------------------ */
+.card-feedback {
+    background: #eff6ff;
+    padding: 0.9rem 1.2rem;
+    border-radius: 16px;
+    border-left: 6px solid #6366f1;
+    font-size: 0.95rem;
+    color: #1e293b;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    line-height: 1.6;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    word-break: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+.card-feedback:hover {
+    background: #e0e7ff;
+    transform: translateX(4px);
+}
+
+/* ------------------------------
+   METRIC / SCORE BOX
+   ------------------------------ */
+div[data-testid="stMetricValue"] {
+    font-size: 3rem !important;
+}
+
+/* ------------------------------
+   DOWNLOAD BUTTON (Secondary)
+   ------------------------------ */
+.stDownloadButton > button, .stButton > button:not([data-testid="baseButton-primary"]) {
+    background: #ffffff !important;
+    color: #4f46e5 !important;
+    border: 2px solid #4f46e5 !important;
+    border-radius: 60px !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease !important;
+    padding: 0.5rem 1.5rem !important;
+}
+
+.stDownloadButton > button:hover, .stButton > button:not([data-testid="baseButton-primary"]):hover {
+    background: #4f46e5 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+}
+
+/* ------------------------------
+   DIVIDERS & SPACERS
+   ------------------------------ */
+hr {
+    margin: 2rem 0 !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+    .pill-green, .pill-red {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    .card-feedback {
+        padding: 0.6rem 1rem;
+    }
+}
