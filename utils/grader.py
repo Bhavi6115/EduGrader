@@ -1,26 +1,15 @@
 import json
 import streamlit as st
-
-# --- TRY IMPORTING GROQ (PREFERRED) OR FALLBACK TO OPENAI ---
-try:
-    from groq import Groq
-    USE_GROQ = True
-except ImportError:
-    from openai import OpenAI
-    USE_GROQ = False
+from groq import Groq
 
 def call_grader(rubric, submission, translate=False):
     """
-    Calls the AI API (Groq or OpenAI) and returns a CLEAN dictionary.
+    Calls the Groq AI API and returns a CLEAN dictionary.
     """
     
-    # --- 1. API CLIENT SETUP ---
-    if USE_GROQ:
-        client = Groq(api_key=st.secrets["GROQ_KEY"])
-        model = "llama-3.1-8b-instant"
-    else:
-        client = OpenAI(api_key=st.secrets["OPENAI_KEY"])
-        model = "gpt-4o-mini"
+    # --- 1. API CLIENT SETUP (Groq only) ---
+    client = Groq(api_key=st.secrets["GROQ_KEY"])
+    model = "llama-3.1-8b-instant"
 
     # --- 2. BUILD THE PROMPT ---
     prompt = f"""
@@ -52,18 +41,17 @@ def call_grader(rubric, submission, translate=False):
     # --- 4. PARSE THE RESPONSE ---
     result_data = json.loads(response.choices[0].message.content)
 
-    # --- 5. 🛡️ THE CRITICAL FIX: CLEAN & STANDARDIZE THE DATA ---
+    # --- 5. 🛡️ CRITICAL FIX: CLEAN & STANDARDIZE THE DATA ---
     
     # Fix 'feedback': If it's a single string, split it into a list of bullet points.
     if isinstance(result_data.get('feedback'), str):
         feedback_text = result_data['feedback']
-        # If it has periods, split into sentences. Otherwise, just wrap it.
         if '. ' in feedback_text:
             result_data['feedback'] = [s.strip() + '.' for s in feedback_text.split('. ') if s.strip()]
         elif '\n' in feedback_text:
             result_data['feedback'] = [line.strip() for line in feedback_text.split('\n') if line.strip()]
         else:
-            result_data['feedback'] = [feedback_text]  # Wrap single sentence into a list
+            result_data['feedback'] = [feedback_text]
     
     # Fix 'strengths': If it's a string, wrap it in a list.
     if isinstance(result_data.get('strengths'), str):
