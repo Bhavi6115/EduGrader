@@ -27,7 +27,7 @@ html, body, [class*="css"] {
 }
 
 /* ------------------------------
-   SIDEBAR UPGRADE
+   SIDEBAR (If you ever add one)
    ------------------------------ */
 section[data-testid="stSidebar"] {
     background: #ffffff !important;
@@ -36,7 +36,7 @@ section[data-testid="stSidebar"] {
 }
 
 section[data-testid="stSidebar"] .stSelectbox label {
-    color: #475569 !important;
+    color: #1e293b !important;
     font-weight: 600 !important;
     font-size: 0.9rem !important;
 }
@@ -53,6 +53,7 @@ section[data-testid="stSidebar"] .stSelectbox label {
     transition: all 0.2s ease !important;
     padding: 1rem !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    color: #1e293b !important;
 }
 
 .stTextArea textarea:focus {
@@ -96,6 +97,8 @@ section[data-testid="stSidebar"] .stSelectbox label {
     transition: all 0.2s ease;
     white-space: normal;
     word-break: break-word;
+    display: inline-block;
+    margin-bottom: 6px;
 }
 .pill-green:hover {
     background: #bbf7d0;
@@ -113,6 +116,8 @@ section[data-testid="stSidebar"] .stSelectbox label {
     transition: all 0.2s ease;
     white-space: normal;
     word-break: break-word;
+    display: inline-block;
+    margin-bottom: 6px;
 }
 .pill-red:hover {
     background: #fecaca;
@@ -120,7 +125,7 @@ section[data-testid="stSidebar"] .stSelectbox label {
 }
 
 /* ------------------------------
-   FIX FOR NEXT STEPS (Full Width Cards)
+   NEXT STEPS CARDS (Full Width)
    ------------------------------ */
 .card-feedback {
     background: #eff6ff;
@@ -137,6 +142,7 @@ section[data-testid="stSidebar"] .stSelectbox label {
     word-break: break-word;
     white-space: normal;
     overflow-wrap: break-word;
+    margin-bottom: 8px;
 }
 .card-feedback:hover {
     background: #e0e7ff;
@@ -144,14 +150,7 @@ section[data-testid="stSidebar"] .stSelectbox label {
 }
 
 /* ------------------------------
-   METRIC / SCORE BOX
-   ------------------------------ */
-div[data-testid="stMetricValue"] {
-    font-size: 3rem !important;
-}
-
-/* ------------------------------
-   DOWNLOAD BUTTON (Secondary)
+   DOWNLOAD / COPY SECTION BUTTONS
    ------------------------------ */
 .stDownloadButton > button, .stButton > button:not([data-testid="baseButton-primary"]) {
     background: #ffffff !important;
@@ -168,6 +167,44 @@ div[data-testid="stMetricValue"] {
     color: white !important;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+}
+
+/* ------------------------------
+   CODE BLOCK FOR COPYING TEXT
+   ------------------------------ */
+.stCodeBlock {
+    border-radius: 16px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #f1f5f9 !important;
+}
+
+/* ------------------------------
+   HIGH CONTRAST FIX (FOR CLOUD DEPLOYMENT)
+   ------------------------------ */
+/* Make all primary labels and text super dark */
+.stMarkdown p, .stMarkdown div, [data-testid="stMarkdownContainer"] {
+    color: #1e293b !important;
+}
+
+/* Make form labels (like "Student Submission") bold and dark */
+.stTextArea label, .stSelectbox label {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+}
+
+/* Ensure the caption text (small gray notes) is still readable */
+.stCaption, .stAlert p {
+    color: #475569 !important;
+}
+
+/* Fix dropdown text */
+.stSelectbox div[data-baseweb="select"] {
+    color: #1e293b !important;
+}
+
+/* Fix input placeholder text */
+.stTextArea textarea::placeholder {
+    color: #94a3b8 !important;
 }
 
 /* ------------------------------

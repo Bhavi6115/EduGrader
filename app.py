@@ -25,12 +25,12 @@ if 'submission' not in st.session_state:
 if 'rubric' not in st.session_state:
     st.session_state['rubric'] = ''
 
-# --- MAIN UI HEADER ---
+# --- MAIN UI HEADER (HIGH CONTRAST FIXED) ---
 st.markdown("""
     <div style="text-align: center; padding: 0.5rem 0 1.5rem 0;">
         <h1 style="color: #6366f1; font-size: 3.5rem; font-weight: 900; margin: 0;">🎓 EduGrader</h1>
-        <p style="color: #64748b; font-size: 1.2rem; margin: 0;">Instant Feedback Machine • Track 2</p>
-        <p style="color: #94a3b8; font-size: 0.9rem;">Paste the student submission and rubric to get AI-powered, actionable feedback.</p>
+        <p style="color: #1e293b; font-size: 1.2rem; margin: 0; font-weight: 500;">Instant Feedback Machine • Track 2</p>
+        <p style="color: #475569; font-size: 0.95rem;">Paste the student submission and rubric to get AI-powered, actionable feedback.</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -100,7 +100,7 @@ if grade_button and submission:
             <div style="background: linear-gradient(135deg, #eef2ff, #ffffff); 
                         border-radius: 20px; padding: 1.5rem; text-align: center; 
                         border: 1px solid #e0e7ff; margin-bottom: 2rem;">
-                <p style="color: #64748b; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;">Total Score</p>
+                <p style="color: #475569; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; font-weight: 600;">Total Score</p>
                 <h1 style="color: #4f46e5; font-size: 4.5rem; margin: -5px 0; font-weight: 800;">{result['score']}</h1>
             </div>
         """, unsafe_allow_html=True)
@@ -163,10 +163,10 @@ if grade_button and submission:
         with col_left:
             st.markdown("**📝 Copy Feedback Manually or Download as TXT**")
             
-            # Display the text in a clean code block — Select All (Ctrl+A) + Copy (Ctrl+C) works 100%
+            # Display the text in a clean code block
             st.code(copy_text, language="text")
             
-            # Download as TXT button — Always works, no browser restrictions
+            # Download as TXT button
             st.download_button(
                 label="📄 Download as TXT File",
                 data=copy_text,
@@ -193,10 +193,10 @@ if grade_button and submission:
             except Exception as e:
                 st.error(f"❌ Could not generate PDF: {e}")
 
-# --- FOOTER ---
+# --- FOOTER (HIGH CONTRAST FIXED) ---
 st.divider()
 st.markdown("""
     <div style="text-align: center; padding: 1rem 0 0.5rem 0;">
-        <p style="color: #94a3b8; font-size: 0.9rem;">Built with ❤️ for students by Bhavii</p>
+        <p style="color: #475569; font-size: 0.9rem; font-weight: 500;">Built with ❤️ for students by Bhavii</p>
     </div>
 """, unsafe_allow_html=True)
